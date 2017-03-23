@@ -4,6 +4,7 @@ from conjureup.controllers.clouds.common import (
     parse_blacklist,
     parse_whitelist
 )
+from conjureup.utils import is_linux
 from ubuntui.ev import EventLoop
 from ubuntui.utils import Color, Padding
 from ubuntui.widgets.buttons import menu_btn
@@ -78,15 +79,19 @@ class CloudView(WidgetWrap):
         total_items.append(Text("Configure a New Cloud"))
         total_items.append(HR())
         if self.whitelist:
-            new_clouds = self.whitelist
+            new_clouds = set(self.whitelist)
         elif self.blacklist:
             # TODO: add vsphere
             new_clouds = set(['localhost', 'maas']) ^ set(
                 self.blacklist)
         else:
             # TODO: add vsphere
-            new_clouds = ['localhost', 'maas']
-        for item in new_clouds:
+            new_clouds = set(['localhost', 'maas'])
+
+        if not is_linux():
+            new_clouds.remove('localhost')
+
+        for item in list(new_clouds):
             total_items.append(
                 Color.body(
                     menu_btn(label=item,

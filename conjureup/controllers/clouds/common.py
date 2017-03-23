@@ -1,4 +1,4 @@
-from conjureup import juju
+from conjureup import juju, utils
 from conjureup.app_config import app
 
 
@@ -29,6 +29,9 @@ def list_clouds():
     """ Returns list of clouds filtering out any results
     """
     clouds = set(juju.get_clouds().keys())
+
+    if not utils.is_linux():
+        clouds.remove('localhost')
 
     if len(parse_whitelist()) > 0:
         whitelist = set(parse_whitelist())
